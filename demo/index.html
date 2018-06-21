@@ -1,70 +1,63 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="../dist/claygl.es.js"></script>
-    <title>Light</title>
-</head>
-<body>
+    <title>Minimal-glTF-Loader renderer example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
-        html, body, #main {
-            overflow: hidden;
-            background: #111;
-            height: 100%;
-            margin: 0;
+        #mycontrols {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+        }
+
+        canvas {
+            background-color: #000
         }
     </style>
-    <div id="main"></div>
-    <script>
-        var app = clay.application.create('#main', {
+</head>
 
-            graphic: {
-                shadow: true,
+<body>
+    <div id="mycontrols">
+        glTF Models: <select id="gltf-model">
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf">DamagedHelmet</option>
+            <!--<option value="https://raw.githubusercontent.com/shrekshao/minimal-gltf-loader/store-drone-model/glTFs/glTF_version_2/buster_drone/scene.gltf">Drone</option>
+            <option value="https://raw.githubusercontent.com/shrekshao/glAvatar/master/demo/models/saber-mixamo-animation-test/saber-animation.gltf">Mixamo-test</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf">BrainStem</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF/Buggy.gltf">Buggy</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf">2CylinderEngine</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF/Avocado.gltf">Avocado</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF/BarramundiFish.gltf">BarramundiFish</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF/BoomBox.gltf">BoomBox</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf">CesiumMan</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMilkTruck/glTF/CesiumMilkTruck.gltf">CesiumMilkTruck</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Corset/glTF/Corset.gltf">Corset</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf">Duck</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/GearboxAssy/glTF/GearboxAssy.gltf">GearboxAssy</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Lantern/glTF/Lantern.gltf">Lantern</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/MetalRoughSpheres/glTF/MetalRoughSpheres.gltf">MetalRoughSpheres</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/NormalTangentTest/glTF/NormalTangentTest.gltf">NormalTangentTest</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/TextureCoordinateTest/glTF/TextureCoordinateTest.gltf">TextureCoordinateTest</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/TextureSettingsTest/glTF/TextureSettingsTest.gltf">TextureSettingsTest</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Triangle/glTF/Triangle.gltf">Triangle</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/TriangleWithoutIndices/glTF/TriangleWithoutIndices.gltf">TriangleWithoutIndices</option>
+            <option value="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/WaterBottle/glTF/WaterBottle.gltf">WaterBottle</option>-->
+        </select> <br>
+        Animations: <select id="animations"></select><br>
+        Play All Animations: <input id="play-all-animations" type="checkbox"><br>
+        Draw Bounding Box: <input id="bbox-toggle" type="checkbox" ><br>
+        Bounding Box type: <select id="bbox-type">
+            <option value="obb">OBB</option>
+            <option value="aabb">AABB(static)</option>
+            <option value="bvh">BVH(static)</option>
+        </select>
+    </div>
 
-                // Enable tonemapping
-                tonemapping: true,
 
-                // Use linear color space instead of default sRGB.
-                linear: true
-            },
+    <script src='../build/app.js'></script>
 
-            init: function (app) {
-                // Create camera
-                this._camera = app.createCamera([2, 1, -2.6], [0, 0, 0]);
-
-                // Create light
-                //app.createDirectionalLight([-1, -1, -1]);
-                app.createDirectionalLight([-1, -1, -1], '#fff', 0.7);
-                //app.createAmbientLight('#fff', 0.3);
-
-                // Use orbit control
-                this._control = new clay.plugin.OrbitControl({
-                    // The target or orbit control. Usually is a camera.
-                    target: this._camera,
-                    // The HTMLDomElement where we need to addEventListener.
-                    domElement: app.container
-                });
-
-                //app.createAmbientCubemapLight('assets/textures/hdr/pisa.hdr', 1, 1);
-                app.createAmbientCubemapLight('assets/textures/hdr/pisa.hdr', 1, 0.3).then(function (result) {
-                    var skybox = new clay.plugin.Skybox({
-                        scene: app.scene,
-                        environmentMap: result.specular.cubemap
-                    });
-                    // Use high lod to show the `rough` skybox
-                    skybox.material.set('lod', 3);
-                });
-                // Load model. return a load promise to make sure the look will be start after model loaded.
-                return app.loadModel('assets/models/damagedHelmet/damagedHelmet.gltf');
-            },
-
-            loop: function (app) {
-                // Control status must be updated each frame.
-                this._control.update(app.frameTime);
-            }
-        });
-    </script>
 </body>
+
 </html>
